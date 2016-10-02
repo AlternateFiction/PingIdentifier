@@ -1,0 +1,11 @@
+## Interface: 70000
+## Title: PingIdentifier
+## Notes: Find out who's assulting your minimap.
+## Author: AlternateFiction
+## Version: @project-version@
+## OptionalDeps: Ace3
+
+embeds.xml
+
+PingIdentifier.xml
+PingIdentifier.lua
