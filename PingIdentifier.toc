@@ -7,5 +7,4 @@
 
 embeds.xml
 
-PingIdentifier.xml
 PingIdentifier.lua
