@@ -6,7 +6,7 @@ local f, ft
 
 function PingIdentifier:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("PingIdentifierDB", self:CreateDB(), "Default").profile
-    self.lastPingPlayerGUID = nil
+    self.lastPingPlayerId = nil
     self.pingCount = {}
     self.pingText = ""
 
@@ -34,26 +34,26 @@ function PingIdentifier:UpdateScreen()
     f:SetAlpha(self.db.Alpha)
 end
 
-function PingIdentifier:ShowPingText(pingPlayerGUID, ...)
-    if not pingPlayerGUID ~= self.lastPingPlayerGUID then
-        local pingPlayerClass = UnitClass(pingPlayerGUID):upper()
+function PingIdentifier:ShowPingText(pingPlayerId, ...)
+    if not pingPlayerId ~= self.lastPingPlayerId then
+        local pingPlayerClass = UnitClass(pingPlayerId):upper()
         local color = RAID_CLASS_COLORS[pingPlayerClass].colorStr
-        local pingPlayer = UnitName(pingPlayerGUID)
+        local pingPlayer = UnitName(pingPlayerId)
         self.pingText = "Ping: |c" .. color .. pingPlayer
     end
-    if not self.pingCount[pingPlayerGUID] then
-        self.pingCount[pingPlayerGUID] = 1
+    if not self.pingCount[pingPlayerId] then
+        self.pingCount[pingPlayerId] = 1
         ft:SetText(self.pingText)
     else
-        self.pingCount[pingPlayerGUID] = self.pingCount[pingPlayerGUID] + 1
-        ft:SetText(self.pingText .. " |cffffffffx" .. self.pingCount[pingPlayerGUID])
+        self.pingCount[pingPlayerId] = self.pingCount[pingPlayerId] + 1
+        ft:SetText(self.pingText .. " |cffffffffx" .. self.pingCount[pingPlayerId])
     end
     f:SetWidth(ft:GetWidth() + 16)
     f:SetHeight(ft:GetHeight() + 12)
     f:Show()
     self:CancelAllTimers()
     self:ScheduleTimer("HidePingText", self.db.DisplayTime)
-    self.lastPingPlayerGUID = pingPlayerGUID
+    self.lastPingPlayerId = pingPlayerId
 end
 
 function PingIdentifier:HidePingText()
