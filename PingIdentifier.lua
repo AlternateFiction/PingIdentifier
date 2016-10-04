@@ -1,8 +1,11 @@
-PingIdentifier = CreateFrame("Frame", nil, UIParent)
-LibStub("AceTimer-3.0"):Embed(PingIdentifier)
+local PingIdentifier = LibStub("AceAddon-3.0"):NewAddon("PingIdentifier", "AceTimer-3.0", "AceEvent-3.0")
+_G.PingIdentifier = PingIdentifier
+
 local f, ft
 
+
 function PingIdentifier:OnInitialize()
+    self.db = LibStub("AceDB-3.0"):New("PingIdentifierDB", self:CreateDB(), "Default").profile
     self.lastPingPlayerGUID = nil
     self.pingCount = {}
     self.pingText = ""
@@ -16,19 +19,22 @@ function PingIdentifier:OnInitialize()
     ft = f:CreateFontString("PingIdentifierFrameText", "ARTWORK", "GameFontNormalSmall")
     ft:SetPoint("CENTER", 0, 0)
 
-    self:SetScript("OnEvent", function (self, ...) self:OnEvent(...) end)
     self:RegisterEvent("MINIMAP_PING")
     self:UpdateScreen()
 end
 
-function PingIdentifier:UpdateScreen()
-    f:ClearAllPoints()
-    f:SetPoint("TOP", "Minimap", "BOTTOM", 0, 5)
-    f:SetScale(0.8)
-    f:SetAlpha(1)
+function PingIdentifier:MINIMAP_PING(event, ...)
+    self:ShowPingText(...)
 end
 
-function PingIdentifier:OnEvent(event, pingPlayerGUID, ...)
+function PingIdentifier:UpdateScreen()
+    f:ClearAllPoints()
+    f:SetPoint(self.anchorOpt[self.db.AnchorPosFrame], "Minimap", self.anchorOpt[self.db.AnchorPosParent], self.db.PosX, self.db.PosY)
+    f:SetScale(self.db.Scale)
+    f:SetAlpha(self.db.Alpha)
+end
+
+function PingIdentifier:ShowPingText(pingPlayerGUID, ...)
     if not pingPlayerGUID ~= self.lastPingPlayerGUID then
         local pingPlayerClass = UnitClass(pingPlayerGUID):upper()
         local color = RAID_CLASS_COLORS[pingPlayerClass].colorStr
@@ -46,7 +52,7 @@ function PingIdentifier:OnEvent(event, pingPlayerGUID, ...)
     f:SetHeight(ft:GetHeight() + 12)
     f:Show()
     self:CancelAllTimers()
-    self:ScheduleTimer("HidePingText", 5)
+    self:ScheduleTimer("HidePingText", self.db.DisplayTime)
     self.lastPingPlayerGUID = pingPlayerGUID
 end
 
@@ -54,5 +60,3 @@ function PingIdentifier:HidePingText()
     f:Hide()
     self.pingCount = {}
 end
-
-PingIdentifier:OnInitialize()

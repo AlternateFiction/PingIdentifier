@@ -4,7 +4,9 @@
 ## Author: AlternateFiction
 ## Version: @project-version@
 ## OptionalDeps: Ace3
+## SavedVariables: PingIdentifierDB
 
 embeds.xml
 
 PingIdentifier.lua
+Config.lua
