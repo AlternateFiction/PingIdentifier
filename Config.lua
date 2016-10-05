@@ -1,10 +1,12 @@
 local PI = _G.PingIdentifier
 
+-- key is the returned value from the options panel 
+-- value is the displayed value in the options panel
 PI.anchorOpt = {
-    "TOP",
-    "BOTTOM",
-    "LEFT",
-    "RIGHT",
+    TOP = "TOP",
+    BOTTOM = "BOTTOM",
+    LEFT = "LEFT",
+    RIGHT = "RIGHT",
 }
 
 
@@ -15,8 +17,8 @@ function PI:CreateDB()
             Alpha = 1,
             PosX = 0,
             PosY = 0,
-            AnchorPosFrame = 1,
-            AnchorPosParent = 2,
+            AnchorPosFrame = "TOP",
+            AnchorPosParent = "BOTTOM",
             DisplayTime = 5,
         }
     }
