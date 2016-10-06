@@ -8,7 +8,7 @@ function PingIdentifier:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("PingIdentifierDB", self:CreateDB(), "Default").profile
     self.lastPingPlayerId = nil
     self.pingCount = {}
-    self.pingText = ""
+    self.playerText = ""
 
     f = CreateFrame("Frame", "PingIdentifierFrame", MiniMapPing)
     f:Hide()
@@ -35,18 +35,22 @@ function PingIdentifier:UpdateScreen()
 end
 
 function PingIdentifier:ShowPingText(pingPlayerId, ...)
+    local pingText = ""
+    if self.activeDb.PingPrefix then
+        pingText = "Ping: "
+    end
     if not pingPlayerId ~= self.lastPingPlayerId then
         local pingPlayerClass = UnitClass(pingPlayerId):upper()
         local color = RAID_CLASS_COLORS[pingPlayerClass].colorStr
         local pingPlayer = UnitName(pingPlayerId)
-        self.pingText = "Ping: |c" .. color .. pingPlayer
+        self.playerText = "|c" .. color .. pingPlayer .. "|r"
     end
     if not self.pingCount[pingPlayerId] then
         self.pingCount[pingPlayerId] = 1
-        ft:SetText(self.pingText)
+        ft:SetText(pingText .. self.playerText)
     else
         self.pingCount[pingPlayerId] = self.pingCount[pingPlayerId] + 1
-        ft:SetText(self.pingText .. " |cffffffffx" .. self.pingCount[pingPlayerId])
+        ft:SetText(pingText .. self.playerText .. " |cffffffffx" .. self.pingCount[pingPlayerId] .. "|r")
     end
     f:SetWidth(ft:GetWidth() + 16)
     f:SetHeight(ft:GetHeight() + 12)

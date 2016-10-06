@@ -20,6 +20,7 @@ function PI:CreateDB()
             AnchorPosFrame = "TOP",
             AnchorPosParent = "BOTTOM",
             DisplayTime = 5,
+            PingPrefix = true,
         }
     }
 end
@@ -105,6 +106,12 @@ local function CreateConfig()
                         softMax = 20,
                         step = 1,
                         width = "double",
+                    },
+                    PingPrefix = {
+                        type = "toggle",
+                        name = "Ping prefix",
+                        desc = "Show the text \"Ping:\" in front of the name of the player who pinged the minimap.",
+                        order = 8,
                     },
                 },
             },
