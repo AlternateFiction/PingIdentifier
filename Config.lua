@@ -50,7 +50,8 @@ local function CreateConfig()
         end,
         set = function(info, value)
             PI.activeDb[info[#info]] = value
-            PI:ScheduleTimer(function() PI:UpdateScreen() PI:ShowPingText("player") end, 0.1)
+            PI:UpdateScreen()
+            PI:ShowPingText("player")
         end,
         args = {
             GroupGeneral = {
@@ -160,6 +161,8 @@ end
 function PI:ResetOptions()
     self.activeDb = CreateDb().profile
     LibStub("AceConfigRegistry-3.0"):NotifyChange(self.name) -- refresh dialog
+    PI:UpdateScreen()
+    PI:ShowPingText("player")
 end
 
 function PI:OpenOptions()
