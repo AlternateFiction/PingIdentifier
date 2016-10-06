@@ -10,7 +10,22 @@ PI.anchorOpt = {
 }
 
 
-function PI:CreateDB()
+-- create shallow copy of table (taken from AceDB-3.0.lua)
+local function copyTable(src, dest)
+    if type(dest) ~= "table" then dest = {} end
+    if type(src) == "table" then
+        for k,v in pairs(src) do
+            if type(v) == "table" then
+                -- try to index the key first so that the metatable creates the defaults, if set, and use that table
+                v = copyTable(v, dest[k])
+            end
+            dest[k] = v
+        end
+    end
+    return dest
+end
+
+local function CreateDb()
     return {
         profile = {
             Scale = 1,
@@ -31,11 +46,11 @@ local function CreateConfig()
         name = PI.name,
         order = 1,
         get = function(info)
-            return PI.db[info[#info]]
+            return PI.activeDb[info[#info]]
         end,
         set = function(info, value)
+            PI.activeDb[info[#info]] = value
             PI:ScheduleTimer(function() PI:UpdateScreen() PI:ShowPingText("player") end, 0.1)
-            PI.db[info[#info]] = value
         end,
         args = {
             GroupGeneral = {
@@ -119,11 +134,37 @@ local function CreateConfig()
     }
 end
 
-function PI:OpenOptions()
-    InterfaceOptionsFrame_OpenToCategory(PI.name)
+
+
+function PI:InitConfig()
+    self.db = LibStub("AceDB-3.0"):New("PingIdentifierDB", CreateDb(), "Default").profile
+    self.activeDb = copyTable(self.db)
+    LibStub("AceConfig-3.0"):RegisterOptionsTable(self.name, CreateConfig)
+    local f = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(self.name)
+    self:Hook(f, "okay", "SaveOptions", true)
+    self:Hook(f, "cancel", "DiscardOptions", true)
+    self:Hook(f, "default", "ResetOptions", true)
 end
 
-LibStub("AceConfig-3.0"):RegisterOptionsTable(PI.name, CreateConfig)
-LibStub("AceConfigDialog-3.0"):AddToBlizOptions(PI.name)
+function PI:SaveOptions()
+    -- if we use copyTable we mess up the metatables
+    for k,v in pairs(self.activeDb) do
+        self.db[k] = v
+    end
+end
+
+function PI:DiscardOptions()
+    self.activeDb = copyTable(self.db)
+end
+
+function PI:ResetOptions()
+    self.activeDb = CreateDb().profile
+    LibStub("AceConfigRegistry-3.0"):NotifyChange(self.name) -- refresh dialog
+end
+
+function PI:OpenOptions()
+    InterfaceOptionsFrame_OpenToCategory(self.name)
+end
+
 SlashCmdList[PI.name:upper()] = PI.OpenOptions
 _G["SLASH_"..PI.name:upper().."1"] = "/"..PI.name

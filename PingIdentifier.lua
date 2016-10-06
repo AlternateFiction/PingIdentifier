@@ -1,11 +1,11 @@
-local PingIdentifier = LibStub("AceAddon-3.0"):NewAddon("PingIdentifier", "AceTimer-3.0", "AceEvent-3.0")
+local PingIdentifier = LibStub("AceAddon-3.0"):NewAddon("PingIdentifier", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
 _G.PingIdentifier = PingIdentifier
 
 local f, ft
 
 
 function PingIdentifier:OnInitialize()
-    self.db = LibStub("AceDB-3.0"):New("PingIdentifierDB", self:CreateDB(), "Default").profile
+    self:InitConfig()
     self.lastPingPlayerId = nil
     self.pingCount = {}
     self.playerText = ""
@@ -29,9 +29,9 @@ end
 
 function PingIdentifier:UpdateScreen()
     f:ClearAllPoints()
-    f:SetPoint(self.anchorOpt[self.db.AnchorPosFrame], "Minimap", self.anchorOpt[self.db.AnchorPosParent], self.db.PosX, self.db.PosY)
-    f:SetScale(self.db.Scale)
-    f:SetAlpha(self.db.Alpha)
+    f:SetPoint(self.activeDb.AnchorPosFrame, "Minimap", self.activeDb.AnchorPosParent, self.activeDb.PosX, self.activeDb.PosY)
+    f:SetScale(self.activeDb.Scale)
+    f:SetAlpha(self.activeDb.Alpha)
 end
 
 function PingIdentifier:ShowPingText(pingPlayerId, ...)
@@ -56,7 +56,7 @@ function PingIdentifier:ShowPingText(pingPlayerId, ...)
     f:SetHeight(ft:GetHeight() + 12)
     f:Show()
     self:CancelAllTimers()
-    self:ScheduleTimer("HidePingText", self.db.DisplayTime)
+    self:ScheduleTimer("HidePingText", self.activeDb.DisplayTime)
     self.lastPingPlayerId = pingPlayerId
 end
 
