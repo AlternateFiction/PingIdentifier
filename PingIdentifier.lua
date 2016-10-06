@@ -6,16 +6,18 @@ local f, ft
 
 function PingIdentifier:OnInitialize()
     self:InitConfig()
-    self.lastPingPlayerId = nil
-    self.pingCount = {}
-    self.playerText = ""
+    self.ping = {
+        lastPlayerId = nil,
+        count = {},
+        playerText = "",
+    }
 
     f = CreateFrame("Frame", "PingIdentifierFrame", MiniMapPing)
     f:Hide()
     f:SetFrameStrata("TOOLTIP")
     f:SetBackdrop({bgFile="Interface\\Tooltips\\UI-Tooltip-Background", edgeFile="Interface\\Tooltips\\UI-Tooltip-Border", tile=true, edgeSize=16, tileSize=16, insets={left=5, right=5, top=5, bottom=5}})
-    f:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b)
     f:SetBackdropColor(TOOLTIP_DEFAULT_BACKGROUND_COLOR.r, TOOLTIP_DEFAULT_BACKGROUND_COLOR.g, TOOLTIP_DEFAULT_BACKGROUND_COLOR.b)
+    f:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b)
     ft = f:CreateFontString("PingIdentifierFrameText", "ARTWORK", "GameFontNormalSmall")
     ft:SetPoint("CENTER", 0, 0)
 
@@ -34,33 +36,33 @@ function PingIdentifier:UpdateScreen()
     f:SetAlpha(self.activeDb.Alpha)
 end
 
-function PingIdentifier:ShowPingText(pingPlayerId, ...)
-    local pingText = ""
+function PingIdentifier:ShowPingText(playerId, ...)
+    local prefixText, countText = "", ""
     if self.activeDb.PingPrefix then
-        pingText = "Ping: "
+        prefixText = "Ping: "
     end
-    if not pingPlayerId ~= self.lastPingPlayerId then
-        local pingPlayerClass = UnitClass(pingPlayerId):upper()
-        local color = RAID_CLASS_COLORS[pingPlayerClass].colorStr
-        local pingPlayer = UnitName(pingPlayerId)
-        self.playerText = "|c" .. color .. pingPlayer .. "|r"
+    if not playerId ~= self.ping.lastPlayerId then
+        local _, class = UnitClass(playerId)
+        local color = RAID_CLASS_COLORS[class].colorStr
+        local name = UnitName(playerId)
+        self.ping.playerText = "|c" .. color .. name .. "|r"
     end
-    if not self.pingCount[pingPlayerId] then
-        self.pingCount[pingPlayerId] = 1
-        ft:SetText(pingText .. self.playerText)
+    if not self.ping.count[playerId] then
+        self.ping.count[playerId] = 1
     else
-        self.pingCount[pingPlayerId] = self.pingCount[pingPlayerId] + 1
-        ft:SetText(pingText .. self.playerText .. " |cffffffffx" .. self.pingCount[pingPlayerId] .. "|r")
+        self.ping.count[playerId] = self.ping.count[playerId] + 1
+        countText = " |cffffffffx" .. self.ping.count[playerId] .. "|r"
     end
+    ft:SetText(prefixText .. self.ping.playerText .. countText)
     f:SetWidth(ft:GetWidth() + 16)
     f:SetHeight(ft:GetHeight() + 12)
     f:Show()
     self:CancelAllTimers()
     self:ScheduleTimer("HidePingText", self.activeDb.DisplayTime)
-    self.lastPingPlayerId = pingPlayerId
+    self.ping.lastPlayerId = playerId
 end
 
 function PingIdentifier:HidePingText()
     f:Hide()
-    self.pingCount = {}
+    self.ping.count = {}
 end
