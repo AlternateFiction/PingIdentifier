@@ -1,6 +1,6 @@
-## Interface: 70000
+## Interface: 70100
 ## Title: PingIdentifier
-## Notes: Find out who's assulting your minimap.
+## Notes: Find out who's assaulting your minimap.
 ## Author: AlternateFiction
 ## Version: @project-version@
 ## OptionalDeps: Ace3
