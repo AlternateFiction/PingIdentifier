@@ -46,10 +46,10 @@ local function CreateConfig()
         name = PI.name,
         order = 1,
         get = function(info)
-            return PI.activeDb[info[#info]]
+            return PI.db[info[#info]]
         end,
         set = function(info, value)
-            PI.activeDb[info[#info]] = value
+            PI.db[info[#info]] = value
             PI:UpdateScreen()
             PI:ShowPingText("player")
         end,
@@ -138,8 +138,8 @@ end
 
 
 function PI:InitConfig()
-    self.db = LibStub("AceDB-3.0"):New("PingIdentifierDB", CreateDb(), "Default").profile
-    self.activeDb = copyTable(self.db)
+    self.storedDb = LibStub("AceDB-3.0"):New("PingIdentifierDB", CreateDb(), "Default").profile
+    self.db = copyTable(self.storedDb)
     LibStub("AceConfig-3.0"):RegisterOptionsTable(self.name, CreateConfig)
     local f = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(self.name)
     self:Hook(f, "okay", "SaveOptions", true)
@@ -149,17 +149,17 @@ end
 
 function PI:SaveOptions()
     -- if we use copyTable we mess up the metatables
-    for k,v in pairs(self.activeDb) do
-        self.db[k] = v
+    for k,v in pairs(self.db) do
+        self.storedDb[k] = v
     end
 end
 
 function PI:DiscardOptions()
-    self.activeDb = copyTable(self.db)
+    self.db = copyTable(self.storedDb)
 end
 
 function PI:ResetOptions()
-    self.activeDb = CreateDb().profile
+    self.db = CreateDb().profile
     LibStub("AceConfigRegistry-3.0"):NotifyChange(self.name) -- refresh dialog
     PI:UpdateScreen()
     PI:ShowPingText("player")
